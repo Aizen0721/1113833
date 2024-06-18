@@ -1,0 +1,216 @@
+body {
+    font-family: airal, sans-serif;
+    font-size: 20px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #1d1f27; /* 深色背景 */
+    color: #cdd6e0; /* 淺色文字 */
+}
+
+/* 個人訊息部分的樣式 */
+#profile {
+    font-family: "Chocolate Classical Sans", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    font-size: 20px; /* 設置全局字體大小 */
+    font-style: normal;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-block {
+    width: calc(50% - 10px); 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border: 3px solid #4CAF50; 
+    padding: 10px; 
+    background-color: #262a34; 
+    box-sizing: border-box; /* 確保 padding 和 border 包括在 width 內 */
+    min-height: 150px; 
+}
+
+.info-block .logo {
+    width: 80px;
+    height: 80px;
+    background-color: #4CAF50; /* logo 區塊背景顏色 */
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px; /* 调整 logo 和文字的距離 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo img {
+    width: 60px;
+}
+
+.info {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+}
+
+.info p {
+    margin: 0;
+    color: #ffffff;
+    text-align: left;
+}
+
+#vanta-bg {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -1;
+}
+
+header {
+    background: rgba(34, 36, 45, 0.95); /* 深色透明背景 */
+    color: #cdd6e0; 
+    padding: 20px 0;
+    text-align: center;
+    position: relative; 
+    z-index: 1;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+#experience {
+    font-size: 30px; /* 設置字體大小 */
+}
+/* 设定父容器为flex布局 */
+.experience-container {
+    display: flex;
+    flex-wrap: wrap; /* 允许换行 */
+    justify-content: space-between; /* 在子元素之间分配空间 */
+    padding: 20px; /* 可根据需要调整 */
+}
+
+/* 设置每个工作经历项的宽度和间距 */
+.experience-item {
+    flex: 0 0 28%; 
+    margin-bottom: 20px; 
+    box-sizing: border-box; 
+    background-color: #2C2C2C; 
+    padding: 10px; 
+    border-radius: 5px; 
+    display: flex; 
+    justify-content: space-around;
+    align-items: center; 
+    border: 1px solid #ffffff
+}
+
+#skills {
+    font-family: "Tiny5", sans-serif;
+    font-size: 30px; /* 設置字體大小 */
+    margin-bottom: 20px; /* 調整每個工作經歷間的間距 */
+}
+
+header nav ul li {
+    margin: 0 15px;
+}
+
+header nav ul li a {
+    color: #cdd6e0;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+header nav ul li a:hover {
+    text-decoration: underline;
+}
+
+section {
+    background: #262a34; /* 深色背景 */
+    margin: 20px auto;
+    padding: 20px;
+    width: 80%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative; /* 確保 section 在 Vanta.js 之上 */
+    z-index: 1;
+}
+h1 {
+    margin: 0;
+    padding-bottom: 10px;
+    color: #FCFCFC; /* 白色文本 */
+}
+h2 {
+    font-size: 50px;
+    margin: 0;
+    padding-bottom: 10px;
+    color: #01B468; /* 白色文本 */
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+.portfolio-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.portfolio-item {
+    width: calc(50% - 10px); /* 計算為一行的一半，並留出間距 */
+    margin-bottom: 20px;
+}
+
+.portfolio-item img,
+.portfolio-item iframe {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #3e4452;
+}
+
+.video-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.video-item {
+    width: calc(50% - 10px); /* 計算為一行的一半，並留出間距 */
+    margin-bottom: 20px;
+}
+/* 按鈕樣式 */
+#BackTop {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: transparent;
+    color: #4CAF50;
+    border: none;
+    padding: 20px; /* 調整按鈕大小 */
+    font-size: 28px; /* 調整圖示大小 */
+    cursor: pointer;
+    z-index: 9999;
+    transition: transform 0.3s ease-in-out;
+}
+
+#BackTop:hover {
+    transform: scale(1.2);
+}
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background: rgba(34, 36, 45, 0.95); /* 深色透明背景 */
+    color: #cdd6e0; /* 浅色文本 */
+    position: relative; /* 確保 footer 在 Vanta.js 之上 */
+    z-index: 1;
+}
