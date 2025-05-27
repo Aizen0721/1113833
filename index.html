@@ -1,182 +1,441 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>詹柏崇-個人簡歷</title>
-  <link href="img/favicon.ico" rel="shortcut icon"/>
-  <link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>詹柏崇的個人履歷</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chocolate+Classical+Sans&family=Tiny5&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
+    <title>孤故甘特圖</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #1cc88a;
+            --background-color: #f8f9fc;
+            --text-color: #5a5c69;
+            --border-color: #e3e6f0;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            border: none;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.35rem;
+            font-weight: bold;
+            color: #4e73df;
+            font-size: 1.25rem;
+        }
+        
+        .gantt-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+        
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: #f8f9fc;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .gantt-bar {
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            position: relative;
+            margin: 5px 0;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .gantt-bar:hover {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .gantt-bar-label {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            padding: 0 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        .task-info {
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            position: absolute;
+            z-index: 100;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                padding: 0.75rem 1rem;
+                font-size: 1.1rem;
+            }
+            
+            .gantt-container {
+                padding: 10px;
+            }
+            
+            .gantt-bar {
+                height: 25px;
+            }
+        }
+        
+        .timeline-container {
+            position: relative;
+            margin-top: 50px;
+            padding: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .timeline {
+            position: relative;
+            height: 500px;
+        }
+        
+        .timeline-bar {
+            position: absolute;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .timeline-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .timeline-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+        
+        .timeline-grid-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #e3e6f0;
+        }
+        
+        .timeline-grid-label {
+            position: absolute;
+            top: -25px;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #858796;
+        }
+        
+        .task-table {
+            margin-top: 30px;
+        }
+        
+        .task-table th {
+            background-color: #4e73df;
+            color: white;
+        }
+        
+        .progress-container {
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-    <div id="vanta-bg"></div> <!-- Vanta.js 動畫容器放在其他內容之前 -->
-
-    <header>
-        <h1>詹柏崇的個人履歷</h1>
-        <nav>
-            <ul>
-                <li><a href="#profile">個人訊息</a></li>
-                <li><a href="#experience">工作經歷</a></li>
-                <li><a href="#skills">技能</a></li>
-                <li><a href="#portfolio">作品展示</a></li>
-                <li><a href="#videos">影片</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <section id="profile">
-        <div class="info-block">
-            <div class="logo">
-                <img src="https://cdn2.iconfinder.com/data/icons/social-productivity-line-art-2/128/profile-photo-64.png" alt="User Icon">
+    <div class="container">
+        <h1 class="text-center my-4">孤故專案甘特圖</h1>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>專案時間軸</span>
+                <span class="text-muted">時間範圍: 2025-02-24 至 2025-10-27</span>
             </div>
-            <div class="info">
-              <h1>姓名：</h1>
-                <p>來自苗栗縣&nbsp;&nbsp;&nbsp;詹柏崇</p>
+            <div class="card-body">
+                <div class="timeline-container">
+                    <div class="timeline" id="timeline"></div>
+                </div>
             </div>
         </div>
-        <div class="info-block">
-            <div class="logo">
-                <img src="https://cdn1.iconfinder.com/data/icons/carbon-design-system-vol-4/32/email-256.png" alt="Email Icon">
+        
+        <div class="card">
+            <div class="card-header">
+                任務列表
             </div>
-            <div class="info">
-              <h1>電子郵件：</h1>
-               <p>aizensousuke0721@gmail.com</p>
-            </div>
-        </div>
-        <div class="info-block">
-            <div class="logo">
-                <img src="https://cdn0.iconfinder.com/data/icons/education-1006/32/cap_graduation_hat_graduate_university_school_student_ceremony_diploma_college-256.png" alt="Department Icon">
-            </div>
-            <div class="info">
-                <h1>系所：</h1>
-                <p>數位學習設計與管理學系</p>
-            </div>
-        </div>
-        <div class="info-block">
-            <div class="logo">
-                <img src="https://cdn3.iconfinder.com/data/icons/knowledges/44/educatiojn-16-256.png" alt="School Icon">
-            </div>
-            <div class="info">
-              <h1>學校：</h1>
-                <p>NCYU 國立嘉義大學</p>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>識別碼</th>
+                                <th>工作名稱</th>
+                                <th>開始日期</th>
+                                <th>結束日期</th>
+                                <th>持續時間 (天)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 任務資料將由JavaScript動態生成 -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </section>
-<section id="experience">
-    <h2>工作經歷</h2>
-    <div class="experience-container">
-        <div class="experience-item">
-            <div class="logo">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-i_J5-mi8ZVEEKnAT1y6ESdRjWYUV-BweWg&s" alt="麥當勞的logo">
+        
+        <div class="card progress-container">
+            <div class="card-header">
+                專案進度概覽
             </div>
-            <div class="experience-details">
-                <h3>麥當勞</h3>
-                <p>職位：工讀生</p>
-                <p>時間：2022/3 - 2022/8</p>
-                <p>職責：外場</p>
-            </div>
-        </div>
-        <div class="experience-item">
-            <div class="logo">
-                <img src="https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/404678785_10160098586750888_5897703256756241879_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=AfPf9VnwFoMQ7kNvgE-Q2AK&_nc_ht=scontent.ftpe7-1.fna&oh=00_AYAgS5Vx08Q7HzkY9d-VOqf-8nUxM24OuhXbYKRinqPRSw&oe=66944A21" alt="安和食堂-1號的logo">
-            </div>
-            <div class="experience-details">
-                <h3>安和食堂-1號</h3>
-                <p>職位：員工</p>
-                <p>時間：2024/6 - 現在</p>
-                <p>職責：內外場</p>
-            </div>
-        </div>
-        <div class="experience-item">
-            <div class="logo">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEXb0mN6x8VA2H63yz73W0MHtq9TKoapfR3Q&s" alt="FoodPanda的logo">
-            </div>
-            <div class="experience-details">
-                <h3>FoodPanda</h3>
-                <p>職位：外送員</p>
-                <p>時間：2023/7 - 2023/9</p>
-                <p>職責：外送</p>
+            <div class="card-body">
+                <canvas id="progressChart"></canvas>
             </div>
         </div>
     </div>
-</section>
-
-    <section id="skills">
-        <h2>技能</h2>
-        <ul>
-            <li>&nbsp; HTML</li>
-            <li>&nbsp; CSS</li>
-            <li>&nbsp; JavaScript</li>
-            <li>&nbsp; E-learning Design</li>
-        </ul>
-    </section>
-    <section id="portfolio">
-        <h2>作品展示</h2>
-        <div class="portfolio-container">
-            <div class="portfolio-item">
-                <h3>攝影</h3>
-                <p>作品 1</p>
-                <img src="https://i.imgur.com/yw7651v.jpg" alt="作品1">
-            </div>
-            <div class="portfolio-item">
-                <h3>&nbsp </h3>
-                <p>作品 2</p>
-                <img src="https://i.imgur.com/BDIrtWN.jpeg" alt="作品2">
-            </div>
-            <div class="portfolio-item">
-                <h3>Figma設計</h3>
-                <p>我的Figma</p>
-                <iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="100%" height="300" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FdLiMayd06KhjRQCshtS5js%2F%25E5%25AF%25B5%25E7%2589%25A9%25E4%25BB%258B%25E7%25B4%25B9%3Fnode-id%3D0-7%26scaling%3Dscale-down%26t%3DJfeN4kdPKhSUjQvT-1" allowfullscreen></iframe>
-            </div>
-            <div class="portfolio-item">
-                <h3>遊戲設計</h3>
-                <p>楓之谷小遊戲</p>
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/Chxq_qYiz0o?si=Ln6YbFJrkOlBWD30" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
-    </section>
-
-    <section id="videos">
-        <h2>報告影片</h2>
-        <div class="video-container">
-            <div class="video-item">
-                <h3>影片1</h3>
-                <iframe width="100%" height="300" src="https://www.youtube.com/embed/uWqLilWt_rM" frameborder="0" allowfullscreen></iframe>
-            </div>
-            <div class="video-item">
-                <h3>影片2</h3>
-                <iframe width="100%" height="300" src="https://www.youtube.com/embed/k8Jq4mWH6No" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2024 詹柏崇. 保留所有權利.</p>
-    </footer>
-<button type="button" id="BackTop" class="toTop-arrow"><i class="fas fa-arrow-up"></i></button>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="scripts.js"></script>
-</body>
-</html>
-<!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js'></script><script  src="./script.js"></script>
-
+    
+    <script>
+        // 甘特圖資料
+        const tasks = [{"id": 1, "name": "主題與目標確定", "start": "2025-02-24", "end": "2025-02-25"}, {"id": 2, "name": "使用者需求訪談", "start": "2025-02-26", "end": "2025-05-12"}, {"id": 3, "name": "遊戲劇情設計", "start": "2025-03-09", "end": "2025-05-26"}, {"id": 4, "name": "遊戲大綱", "start": "2025-03-13", "end": "2025-03-25"}, {"id": 5, "name": "關卡設計", "start": "2025-03-26", "end": "2025-03-29"}, {"id": 6, "name": "遊戲機制與系統設計", "start": "2025-03-31", "end": "2025-10-06"}, {"id": 7, "name": "圖形設計與動畫製作", "start": "2025-04-07", "end": "2025-10-25"}, {"id": 8, "name": "程式開發", "start": "2025-03-24", "end": "2025-10-25"}, {"id": 9, "name": "聲音與音效製作", "start": "2025-05-05", "end": "2025-10-25"}, {"id": 10, "name": "內部測試", "start": "2025-08-18", "end": "2025-10-25"}, {"id": 11, "name": "使用者測試", "start": "2025-10-06", "end": "2025-10-27"}, {"id": 12, "name": "蒐集測試反饋", "start": "2025-10-20", "end": "2025-10-27"}, {"id": 13, "name": "優化遊戲", "start": "2025-10-20", "end": "2025-02-02"}];
+        
+        // 計算日期差異天數
+        function dateDiffInDays(date1, date2) {
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            return Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-TW');
+        }
+        
+        // 生成時間軸
+        function generateTimeline() {
+            const timeline = document.getElementById('timeline');
+            const minDate = new Date('2025-02-24');
+            const maxDate = new Date('2025-10-27');
+            
+            // 計算總天數
+            const totalDays = dateDiffInDays(minDate, maxDate);
+            
+            // 設定時間軸寬度
+            const timelineWidth = Math.max(totalDays * 20, window.innerWidth - 100);
+            timeline.style.width = `${timelineWidth}px`;
+            
+            // 生成網格線
+            const timelineGrid = document.createElement('div');
+            timelineGrid.className = 'timeline-grid';
+            
+            // 計算月份網格
+            let currentDate = new Date(minDate);
+            currentDate.setDate(1); // 從月初開始
+            
+            while (currentDate <= maxDate) {
+                const daysSinceStart = dateDiffInDays(minDate, currentDate);
+                const position = (daysSinceStart / totalDays) * timelineWidth;
+                
+                const gridLine = document.createElement('div');
+                gridLine.className = 'timeline-grid-line';
+                gridLine.style.left = `${position}px`;
+                
+                const gridLabel = document.createElement('div');
+                gridLabel.className = 'timeline-grid-label';
+                gridLabel.style.left = `${position}px`;
+                gridLabel.textContent = `${currentDate.getFullYear()}/${currentDate.getMonth() + 1}`;
+                
+                timelineGrid.appendChild(gridLine);
+                timelineGrid.appendChild(gridLabel);
+                
+                // 移至下個月
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+            
+            timeline.appendChild(timelineGrid);
+            
+            // 生成任務條
+            tasks.forEach((task, index) => {
+                const startDate = new Date(task.start);
+                const endDate = new Date(task.end);
+                
+                const daysSinceStart = dateDiffInDays(minDate, startDate);
+                const taskDuration = dateDiffInDays(startDate, endDate);
+                
+                const leftPosition = (daysSinceStart / totalDays) * timelineWidth;
+                const width = (taskDuration / totalDays) * timelineWidth;
+                
+                const taskBar = document.createElement('div');
+                taskBar.className = 'timeline-bar';
+                taskBar.style.left = `${leftPosition}px`;
+                taskBar.style.width = `${width}px`;
+                taskBar.style.top = `${index * 50}px`;
+                taskBar.style.backgroundColor = getRandomColor(index);
+                taskBar.textContent = task.name;
+                taskBar.setAttribute('data-task-id', task.id);
+                
+                taskBar.addEventListener('click', () => {
+                    alert(`任務: ${task.name}\n開始: ${formatDate(task.start)}\n結束: ${formatDate(task.end)}\n持續: ${taskDuration} 天`);
+                });
+                
+                timeline.appendChild(taskBar);
+            });
+        }
+        
+        // 生成任務表格
+        function generateTaskTable() {
+            const tbody = document.querySelector('table tbody');
+            
+            tasks.forEach(task => {
+                const startDate = new Date(task.start);
+                const endDate = new Date(task.end);
+                const duration = dateDiffInDays(startDate, endDate);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${task.id}</td>
+                    <td>${task.name}</td>
+                    <td>${formatDate(task.start)}</td>
+                    <td>${formatDate(task.end)}</td>
+                    <td>${duration} 天</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 生成進度圖表
+        function generateProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            // 計算每個月的任務數量
+            const monthlyTasks = {};
+            const today = new Date();
+            
+            tasks.forEach(task => {
+                const startDate = new Date(task.start);
+                const endDate = new Date(task.end);
+                
+                // 檢查任務是否已完成
+                const isCompleted = endDate < today;
+                
+                // 生成月份標籤
+                const monthLabel = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                if (!monthlyTasks[monthLabel]) {
+                    monthlyTasks[monthLabel] = {
+                        total: 0,
+                        completed: 0
+                    };
+                }
+                
+                monthlyTasks[monthLabel].total += 1;
+                if (isCompleted) {
+                    monthlyTasks[monthLabel].completed += 1;
+                }
+            });
+            
+            // 準備圖表資料
+            const labels = Object.keys(monthlyTasks).sort();
+            const totalData = labels.map(month => monthlyTasks[month].total);
+            const completedData = labels.map(month => monthlyTasks[month].completed);
+            
+            // 創建圖表
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '總任務數',
+                            data: totalData,
+                            backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '已完成任務',
+                            data: completedData,
+                            backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                            borderColor: 'rgba(28, 200, 138, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 生成隨機顏色
+        function getRandomColor(index) {
+            const colors = [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                '#5a5c69', '#6610f2', '#6f42c1', '#fd7e14', '#20c9a6'
+            ];
+            return colors[index % colors.length];
+        }
+        
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTimeline();
+            generateTaskTable();
+            generateProgressChart();
+            
+            // 響應式調整
+            window.addEventListener('resize', () => {
+                const timeline = document.getElementById('timeline');
+                timeline.innerHTML = '';
+                generateTimeline();
+            });
+        });
+    </script>
 </body>
 </html>
