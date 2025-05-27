@@ -121,7 +121,8 @@
         
         .timeline {
             position: relative;
-            height: 500px;
+            height: 600px; /* 進一步增加高度，為X軸標註留出更多空間 */
+            margin-bottom: 60px; /* 增加底部間距 */
         }
         
         .timeline-bar {
@@ -136,6 +137,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: all 0.3s;
             cursor: pointer;
+            z-index: 5; /* 確保任務條在網格線之上 */
         }
         
         .timeline-bar:hover {
@@ -168,12 +170,13 @@
             color: #858796;
         }
         
-        /* 新增X軸時間標註樣式 */
+        /* 優化X軸時間標註樣式 */
         .time-axis {
             position: relative;
-            height: 30px;
-            margin-top: 10px;
+            height: 60px; /* 進一步增加高度 */
+            margin-top: 30px; /* 增加與任務條的間距 */
             border-top: 1px solid #e3e6f0;
+            z-index: 10; /* 確保時間軸在最上層 */
         }
         
         .time-marker {
@@ -182,16 +185,31 @@
             transform: translateX(-50%);
             font-size: 0.7rem;
             color: #858796;
+            white-space: nowrap;
+            /* 旋轉標籤以節省水平空間 */
+            transform-origin: left top;
+            transform: rotate(-45deg) translateX(-50%);
+            padding-left: 5px;
+            z-index: 15; /* 確保標記在最上層 */
+            background-color: rgba(248, 249, 252, 0.9); /* 增加背景不透明度 */
+            padding: 2px 5px;
+            border-radius: 3px;
+            border: 1px solid rgba(227, 230, 240, 0.5); /* 添加邊框 */
         }
         
         .time-marker::before {
             content: '';
             position: absolute;
             top: -5px;
-            left: 50%;
+            left: 0;
             height: 5px;
             width: 1px;
             background-color: #e3e6f0;
+        }
+        
+        /* 添加第二層時間標記樣式 */
+        .time-marker.second-row {
+            top: 35px; /* 第二層標記位置 */
         }
         
         .task-table {
@@ -215,12 +233,12 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>專案時間軸</span>
-                <span class="text-muted">時間範圍: 2025-02-24 至 2026-02-02</span>
+                <span class="text-muted">時間範圍: 2025-02-24 至 2025-10-27</span>
             </div>
             <div class="card-body">
                 <div class="timeline-container">
                     <div class="timeline" id="timeline"></div>
-                    <!-- 新增X軸時間標註容器 -->
+                    <!-- X軸時間標註容器 -->
                     <div class="time-axis" id="timeAxis"></div>
                 </div>
             </div>
@@ -322,10 +340,8 @@
             
             timeline.appendChild(timelineGrid);
             
-            // 生成X軸時間標註
-            generateTimeAxis(minDate, maxDate, totalDays, timelineWidth);
-            
             // 生成任務條
+            const taskBars = [];
             tasks.forEach((task, index) => {
                 const startDate = new Date(task.start);
                 const endDate = new Date(task.end);
@@ -350,40 +366,157 @@
                 });
                 
                 timeline.appendChild(taskBar);
+                
+                // 保存任務條信息用於後續檢查重疊
+                taskBars.push({
+                    id: task.id,
+                    left: leftPosition,
+                    right: leftPosition + width,
+                    top: index * 50,
+                    bottom: index * 50 + 40,
+                    element: taskBar
+                });
             });
+            
+            // 生成X軸時間標註，並避免與任務條重疊
+            generateTimeAxis(minDate, maxDate, totalDays, timelineWidth, taskBars);
         }
         
-        // 生成X軸時間標註
-        function generateTimeAxis(minDate, maxDate, totalDays, timelineWidth) {
+        // 檢查標記是否與任務條重疊
+        function checkOverlap(markerPosition, markerRow, taskBars, timelineWidth) {
+            // 計算標記的大致範圍（考慮到旋轉後的寬度）
+            const markerWidth = 60; // 估計標記的寬度
+            const markerHeight = 20; // 估計標記的高度
+            
+            // 標記的位置（考慮到不同行的垂直位置）
+            const markerTop = markerRow === 1 ? 5 : 35;
+            const markerBottom = markerTop + markerHeight;
+            
+            // 檢查是否與任何任務條重疊
+            for (const bar of taskBars) {
+                // 只檢查最下方的幾個任務條（靠近X軸的）
+                if (bar.top < 500) continue; // 只關注底部的任務條
+                
+                // 檢查水平重疊
+                if (markerPosition - markerWidth/2 <= bar.right && 
+                    markerPosition + markerWidth/2 >= bar.left) {
+                    // 檢查垂直重疊（考慮標記的垂直位置）
+                    if (markerBottom >= bar.top && markerTop <= bar.bottom) {
+                        return true; // 有重疊
+                    }
+                }
+            }
+            
+            // 檢查是否超出時間軸範圍
+            if (markerPosition < 0 || markerPosition > timelineWidth) {
+                return true;
+            }
+            
+            return false; // 無重疊
+        }
+        
+        // 生成X軸時間標註 - 優化版本，避免與任務條重疊
+        function generateTimeAxis(minDate, maxDate, totalDays, timelineWidth, taskBars) {
             const timeAxis = document.getElementById('timeAxis');
             
-            // 計算時間標記間隔 (根據總天數決定標記間隔)
-            let interval;
-            if (totalDays <= 60) {
+            // 計算最小標記間距（像素）
+            const minMarkerSpacing = 80; // 最小標記間距，避免重疊
+            
+            // 計算時間標記間隔（天數）
+            // 根據總寬度動態調整間隔，確保標記不會重疊
+            let interval = Math.ceil(totalDays * minMarkerSpacing / timelineWidth);
+            
+            // 確保間隔至少為1天
+            interval = Math.max(1, interval);
+            
+            // 根據間隔調整為有意義的時間單位（週或月）
+            if (interval < 7) {
                 interval = 7; // 每週
-            } else if (totalDays <= 180) {
+            } else if (interval < 14) {
                 interval = 14; // 每兩週
-            } else {
+            } else if (interval < 30) {
                 interval = 30; // 每月
+            } else {
+                interval = Math.ceil(interval / 30) * 30; // 每x個月
             }
+            
+            // 標記重要日期（專案開始、結束和每個月初）
+            const importantDates = new Set();
+            importantDates.add(minDate.getTime()); // 專案開始
+            importantDates.add(maxDate.getTime()); // 專案結束
+            
+            // 添加每個月的第一天
+            let monthDate = new Date(minDate);
+            while (monthDate <= maxDate) {
+                importantDates.add(monthDate.getTime());
+                monthDate.setDate(1);
+                monthDate.setMonth(monthDate.getMonth() + 1);
+            }
+            
+            // 添加任務的開始和結束日期
+            tasks.forEach(task => {
+                const startDate = new Date(task.start);
+                const endDate = new Date(task.end);
+                importantDates.add(startDate.getTime());
+                importantDates.add(endDate.getTime());
+            });
             
             // 生成時間標記
             let currentDate = new Date(minDate);
             let dayCount = 0;
             
+            // 用於追蹤已添加的標記位置，避免重疊
+            const addedMarkerPositions = [];
+            
             while (currentDate <= maxDate) {
-                // 每隔指定天數添加一個標記
-                if (dayCount % interval === 0 || currentDate.getTime() === minDate.getTime() || 
-                    (maxDate.getTime() - currentDate.getTime()) < (interval * 24 * 60 * 60 * 1000)) {
-                    
+                const isImportantDate = importantDates.has(currentDate.getTime());
+                
+                // 每隔指定天數添加一個標記，或者是重要日期
+                if (dayCount % interval === 0 || isImportantDate) {
                     const position = (dayCount / totalDays) * timelineWidth;
                     
-                    // 添加時間軸標記
-                    const timeMarker = document.createElement('div');
-                    timeMarker.className = 'time-marker';
-                    timeMarker.style.left = `${position}px`;
-                    timeMarker.textContent = `${currentDate.getFullYear()}/${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
-                    timeAxis.appendChild(timeMarker);
+                    // 檢查是否有足夠空間放置標記
+                    let shouldAddMarker = true;
+                    for (const pos of addedMarkerPositions) {
+                        if (Math.abs(pos - position) < minMarkerSpacing) {
+                            shouldAddMarker = false;
+                            break;
+                        }
+                    }
+                    
+                    if (shouldAddMarker) {
+                        // 決定標記應該放在第一行還是第二行
+                        // 檢查與任務條的重疊
+                        let markerRow = 1; // 默認第一行
+                        
+                        // 檢查第一行是否重疊
+                        if (checkOverlap(position, 1, taskBars, timelineWidth)) {
+                            // 如果第一行重疊，嘗試第二行
+                            markerRow = 2;
+                            
+                            // 如果第二行也重疊，則跳過此標記
+                            if (checkOverlap(position, 2, taskBars, timelineWidth)) {
+                                continue;
+                            }
+                        }
+                        
+                        // 添加時間軸標記
+                        const timeMarker = document.createElement('div');
+                        timeMarker.className = markerRow === 1 ? 'time-marker' : 'time-marker second-row';
+                        timeMarker.style.left = `${position}px`;
+                        
+                        // 根據日期類型使用不同格式
+                        if (currentDate.getDate() === 1 || isImportantDate) {
+                            // 月初或重要日期顯示完整日期
+                            timeMarker.textContent = `${currentDate.getFullYear()}/${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
+                        } else {
+                            // 其他日期只顯示月/日
+                            timeMarker.textContent = `${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
+                        }
+                        
+                        timeAxis.appendChild(timeMarker);
+                        addedMarkerPositions.push(position);
+                    }
                 }
                 
                 // 前進一天
@@ -414,23 +547,22 @@
             });
         }
         
-        // 生成進度圖表
+        // 生成進度圖表 - 修改為按結束時間計算
         function generateProgressChart() {
             const ctx = document.getElementById('progressChart').getContext('2d');
             
-            // 計算每個月的任務數量
+            // 計算每個月的任務數量 - 使用結束時間而非開始時間
             const monthlyTasks = {};
             const today = new Date();
             
             tasks.forEach(task => {
-                const startDate = new Date(task.start);
                 const endDate = new Date(task.end);
                 
                 // 檢查任務是否已完成
                 const isCompleted = endDate < today;
                 
-                // 生成月份標籤
-                const monthLabel = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+                // 生成月份標籤 - 使用結束時間
+                const monthLabel = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}`;
                 
                 if (!monthlyTasks[monthLabel]) {
                     monthlyTasks[monthLabel] = {
