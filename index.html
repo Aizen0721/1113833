@@ -168,6 +168,32 @@
             color: #858796;
         }
         
+        /* 新增X軸時間標註樣式 */
+        .time-axis {
+            position: relative;
+            height: 30px;
+            margin-top: 10px;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        .time-marker {
+            position: absolute;
+            top: 5px;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #858796;
+        }
+        
+        .time-marker::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            height: 5px;
+            width: 1px;
+            background-color: #e3e6f0;
+        }
+        
         .task-table {
             margin-top: 30px;
         }
@@ -189,11 +215,13 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>專案時間軸</span>
-                <span class="text-muted">時間範圍: 2025-02-24 至 2025-10-27</span>
+                <span class="text-muted">時間範圍: 2025-02-24 至 2026-02-02</span>
             </div>
             <div class="card-body">
                 <div class="timeline-container">
                     <div class="timeline" id="timeline"></div>
+                    <!-- 新增X軸時間標註容器 -->
+                    <div class="time-axis" id="timeAxis"></div>
                 </div>
             </div>
         </div>
@@ -252,6 +280,7 @@
         // 生成時間軸
         function generateTimeline() {
             const timeline = document.getElementById('timeline');
+            const timeAxis = document.getElementById('timeAxis');
             const minDate = new Date('2025-02-24');
             const maxDate = new Date('2025-10-27');
             
@@ -261,6 +290,7 @@
             // 設定時間軸寬度
             const timelineWidth = Math.max(totalDays * 20, window.innerWidth - 100);
             timeline.style.width = `${timelineWidth}px`;
+            timeAxis.style.width = `${timelineWidth}px`;
             
             // 生成網格線
             const timelineGrid = document.createElement('div');
@@ -292,6 +322,9 @@
             
             timeline.appendChild(timelineGrid);
             
+            // 生成X軸時間標註
+            generateTimeAxis(minDate, maxDate, totalDays, timelineWidth);
+            
             // 生成任務條
             tasks.forEach((task, index) => {
                 const startDate = new Date(task.start);
@@ -318,6 +351,45 @@
                 
                 timeline.appendChild(taskBar);
             });
+        }
+        
+        // 生成X軸時間標註
+        function generateTimeAxis(minDate, maxDate, totalDays, timelineWidth) {
+            const timeAxis = document.getElementById('timeAxis');
+            
+            // 計算時間標記間隔 (根據總天數決定標記間隔)
+            let interval;
+            if (totalDays <= 60) {
+                interval = 7; // 每週
+            } else if (totalDays <= 180) {
+                interval = 14; // 每兩週
+            } else {
+                interval = 30; // 每月
+            }
+            
+            // 生成時間標記
+            let currentDate = new Date(minDate);
+            let dayCount = 0;
+            
+            while (currentDate <= maxDate) {
+                // 每隔指定天數添加一個標記
+                if (dayCount % interval === 0 || currentDate.getTime() === minDate.getTime() || 
+                    (maxDate.getTime() - currentDate.getTime()) < (interval * 24 * 60 * 60 * 1000)) {
+                    
+                    const position = (dayCount / totalDays) * timelineWidth;
+                    
+                    // 添加時間軸標記
+                    const timeMarker = document.createElement('div');
+                    timeMarker.className = 'time-marker';
+                    timeMarker.style.left = `${position}px`;
+                    timeMarker.textContent = `${currentDate.getFullYear()}/${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
+                    timeAxis.appendChild(timeMarker);
+                }
+                
+                // 前進一天
+                currentDate.setDate(currentDate.getDate() + 1);
+                dayCount++;
+            }
         }
         
         // 生成任務表格
@@ -432,7 +504,9 @@
             // 響應式調整
             window.addEventListener('resize', () => {
                 const timeline = document.getElementById('timeline');
+                const timeAxis = document.getElementById('timeAxis');
                 timeline.innerHTML = '';
+                timeAxis.innerHTML = '';
                 generateTimeline();
             });
         });
